@@ -1,34 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Circle Representation</title>
+  <title>Rắn săn mồi</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+      border: 2px solid black;
+    }
+  </style>
 </head>
 <body>
-<canvas id="myCanvas" width="400" height="400"></canvas>
-<script>
-  class Circle {
-    constructor(x, y, radius, color) {
-      this.x = x;
-      this.y = y;
-      this.radius = radius;
-      this.color = color;
-    }
+<canvas id="gameCanvas" width="640" height="480"></canvas>
+<script>  const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-    render(canvas) {
-      if (canvas.getContext) {
-        let ctx = canvas.getContext("2d");
+const GRID_SIZE = 20;
+const GRID_WIDTH = canvas.width / GRID_SIZE;
+const GRID_HEIGHT = canvas.height / GRID_SIZE;
 
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-        ctx.closePath();
-      }
+const UP = { x: 0, y: -1 };
+const DOWN = { x: 0, y: 1 };
+const LEFT = { x: -1, y: 0 };
+const RIGHT = { x: 1, y: 0 };
+
+let snake = [{ x: GRID_WIDTH / 2, y: GRID_HEIGHT / 2 }];
+let direction = RIGHT;
+let food = spawnFood();
+
+function spawnFood() {
+  while (true) {
+    const x = Math.floor(Math.random() * GRID_WIDTH);
+    const y = Math.floor(Math.random() * GRID_HEIGHT);
+    if (!snake.some(segment => segment.x === x && segment.y === y)) {
+      return { x, y };
     }
   }
-  let myCanvas = document.getElementById("myCanvas");
-  let circle = new Circle(50, 50, 80, "#000000");//toạ độ 5050 r=80 màu đen
-  circle.render(myCanvas);
+}
+
+function drawSnake() {
+  ctx.fillStyle = "green";
+  snake.forEach(segment => {
+    ctx.fillRect(segment.x * GRID_SIZE, segment.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+  });
+}
+
+function drawFood() {
+  ctx.fillStyle = "red";
+  ctx.fillRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+}
+
+function moveSnake() {
+  const head = { x: snake[snake.length - 1].x + direction.x, y: snake[snake.length - 1].y + direction.y };
+  snake.push(head);
+  if (head.x === food.x && head.y === food.y) {
+    food = spawnFood();
+  } else {
+    snake.shift();
+  }
+}
+
+function checkCollision() {
+  const head = snake[snake.length - 1];
+  return head.x < 0 || head.x >= GRID_WIDTH || head.y < 0 || head.y >= GRID_HEIGHT ||
+          snake.some((segment, index) => index !== snake.length - 1 && segment.x === head.x && segment.y === head.y);
+}
+
+function gameLoop() {
+  if (checkCollision()) {
+    alert("Game Over");
+    return;
+  }
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawSnake();
+  drawFood();
+  moveSnake();
+
+  setTimeout(gameLoop, 100); // Tốc độ di chuyển của rắn (100ms)
+}
+
+document.addEventListener("keydown", event => {
+  if (event.key === "ArrowUp" && direction !== DOWN) {
+    direction = UP;
+  } else if (event.key === "ArrowDown" && direction !== UP) {
+    direction = DOWN;
+  } else if (event.key === "ArrowLeft" && direction !== RIGHT) {
+    direction = LEFT;
+  } else if (event.key === "ArrowRight" && direction !== LEFT) {
+    direction = RIGHT;
+  }
+});
+
+gameLoop();
 </script>
 </body>
 </html>

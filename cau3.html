@@ -2,38 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Câu 3</title>
 </head>
 <body>
 <script>
-  function isPrime(number) {
-    if (number <= 1) {
-      return false;
+    function check(number) {
+        if (number <= 1) {
+            return false;
+        }
+        if (number <= 3) {
+            return true;
+        }
+        if (number % 2 === 0 || number % 3 === 0) {
+            return false;
+        }
+
+        for (let i = 5; i * i <= number; i += 6) {
+            if (number % i === 0 || number % (i + 2) === 0) {
+                return false;
+            }
+        }
+        return true;
     }
-    for (let i = 2; i <= Math.sqrt(number); i++) {
-      if (number % i === 0) {
-        return false;
-      }
+    let resutl = 0
+    let a = +prompt("Nhập só ngẫu nhiên:")
+    function sumOfListPrime(a) {
+        for (let i = 1; i <= a; i++) {
+            if (check(i)) {
+                resutl += i;
+            }
+        }
+        return resutl;
     }
-
-    return true;
-  }
-  function sumOfListPrime(x) {
-    let sum = 0;
-
-    for (let i = 0; i <= x; i++) {
-      if (isPrime(i)) {
-        sum += i;
-      }
-    }
-
-    return sum;
-  }
-  //Dùng Hàm
-  let x = 10;
-  let sumOfPrimes = sumOfListPrime(x);
-  alert("Tổng các số nguyên tố từ 0 đến " + x + " là: " + sumOfPrimes);
-
+    sumOfListPrime(a)
+    console.log(resutl)
 </script>
+
 </body>
 </html>
